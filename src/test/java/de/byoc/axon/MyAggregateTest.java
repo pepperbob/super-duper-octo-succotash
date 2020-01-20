@@ -1,4 +1,4 @@
-package de.byoc.axon.commands;
+package de.byoc.axon;
 
 import de.byoc.axon.*;
 import org.axonframework.common.jdbc.PersistenceExceptionResolver;
@@ -23,8 +23,8 @@ public class MyAggregateTest {
   private static Logger log = LoggerFactory.getLogger(MyAggregateTest.class);
 
   Configuration axon;
-  private EntityTransaction trans;
-  private EntityManager em;
+  EntityTransaction trans;
+  EntityManager em;
 
   @Before
   public void setup() {
@@ -57,14 +57,13 @@ public class MyAggregateTest {
     axon.commandGateway().sendAndWait(new DoAction(command.id, new EventA()));
     axon.commandGateway().sendAndWait(new DoAction(command.id, new EventB()));
     axon.commandGateway().sendAndWait(new DoAction(command.id, new EventC()));
+    axon.commandGateway().sendAndWait(new DoAction(command.id, new EventA()));
+    axon.commandGateway().sendAndWait(new DoAction(command.id, new EventB()));
+    axon.commandGateway().sendAndWait(new DoAction(command.id, new EventC()));
 
-    em.flush();
     List<DomainEventEntry> list = em.createQuery("from DomainEventEntry d", DomainEventEntry.class).getResultList();
 
     list.stream().forEach(x -> log.info("{}, {}", x.getType(), x.getSequenceNumber()));
-
-    trans.commit();
-
   }
 
 }
